@@ -7,6 +7,13 @@ import { imageSizeFromFile } from '../lib/fromFile'
 
 // If something other than a buffer or filepath is passed
 describe('Invalid invocation', () => {
+  describe('passing a file path', () => {
+    it('should preserve compatibility with path-based callers', () => {
+      const size = imageSize('specs/images/valid/png/sample.png')
+      assert.equal(size.type, 'png')
+    })
+  })
+
   describe('malformed ICNS entries', () => {
     it('rejects a zero-length entry instead of looping indefinitely', () => {
       const input = new Uint8Array([

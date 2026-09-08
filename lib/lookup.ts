@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+
 import { detector } from './detector'
 import type { imageType } from './types/index'
 import { typeHandlers } from './types/index'
@@ -12,14 +14,18 @@ const globalOptions: Options = {
 }
 
 /**
- * Return size information based on an Uint8Array
+ * Return size information based on an Uint8Array or a local file path.
  *
- * @param {Uint8Array} input
+ * @param {Uint8Array | string} input
  * @returns {ISizeCalculationResult}
  */
-export function imageSize(input: Uint8Array): ISizeCalculationResult {
+export function imageSize(input: Uint8Array): ISizeCalculationResult
+export function imageSize(input: string): ISizeCalculationResult
+export function imageSize(input: Uint8Array | string): ISizeCalculationResult {
+  const data = typeof input === 'string' ? readFileSync(input) : input
+
   // detect the file type... don't rely on the extension
-  const type = detector(input)
+  const type = detector(data)
 
   if (typeof type !== 'undefined') {
     if (globalOptions.disabledTypes.indexOf(type) > -1) {
@@ -27,7 +33,7 @@ export function imageSize(input: Uint8Array): ISizeCalculationResult {
     }
 
     // find an appropriate handler for this file type
-    const size = typeHandlers.get(type)!.calculate(input)
+    const size = typeHandlers.get(type)!.calculate(data)
     if (size !== undefined) {
       size.type = size.type ?? type
 
