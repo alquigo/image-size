@@ -21,6 +21,7 @@ const FILE_LENGTH_OFFSET = 4 // MSB => BIG ENDIAN
  * | 8      | n    | Icon data                                                        |
  */
 const ENTRY_LENGTH_OFFSET = 4 // MSB => BIG ENDIAN
+const SIZE_IMAGE_ENTRY_HEADER = 4 + 4 // 8
 
 const ICON_TYPE_SIZE: Record<string, number> = {
   ICON: 32,
@@ -92,10 +93,24 @@ export const ICNS: IImage = {
     const images: ISize[] = []
 
     while (imageOffset < fileLength && imageOffset < inputLength) {
+      if (inputLength - imageOffset < SIZE_IMAGE_ENTRY_HEADER) {
+        throw new TypeError('Invalid ICNS, incomplete image entry')
+      }
+
       const imageHeader = readImageHeader(input, imageOffset)
+      const imageLength = imageHeader[1]
+      if (imageLength < SIZE_IMAGE_ENTRY_HEADER) {
+        throw new TypeError('Invalid ICNS, invalid image entry length')
+      }
+
+      const nextImageOffset = imageOffset + imageLength
+      if (nextImageOffset > fileLength || nextImageOffset > inputLength) {
+        throw new TypeError('Invalid ICNS, image entry exceeds file length')
+      }
+
       const imageSize = getImageSize(imageHeader[0])
       images.push(imageSize)
-      imageOffset += imageHeader[1]
+      imageOffset = nextImageOffset
     }
 
     if (images.length === 0) {
