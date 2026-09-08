@@ -7,6 +7,34 @@ import { imageSizeFromFile } from '../lib/fromFile'
 
 // If something other than a buffer or filepath is passed
 describe('Invalid invocation', () => {
+  describe('malformed ICNS entries', () => {
+    it('rejects a zero-length entry instead of looping indefinitely', () => {
+      const input = new Uint8Array([
+        0x69,
+        0x63,
+        0x6e,
+        0x73, // icns
+        0x00,
+        0x00,
+        0x00,
+        0x10, // file length
+        0x69,
+        0x63,
+        0x30,
+        0x37, // ic07
+        0x00,
+        0x00,
+        0x00,
+        0x00, // invalid entry length
+      ])
+
+      assert.throws(
+        () => imageSize(input),
+        /Invalid ICNS, invalid image entry length/,
+      )
+    })
+  })
+
   describe('passing buffer for tiff', () => {
     const bufferSize = 2048
     const file = 'specs/images/valid/tiff/little-endian.tiff'

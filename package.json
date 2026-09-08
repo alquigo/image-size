@@ -1,6 +1,6 @@
 {
   "name": "image-size",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "get dimensions of any image file",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -54,7 +54,8 @@
     "clean": "rm -rf dist docs",
     "generate-docs": "typedoc",
     "build": "tsup",
-    "prepack": "yarn clean && yarn build"
+    "prepare": "npm run build",
+    "prepack": "npm run clean && npm run build"
   },
   "keywords": [
     "image",
@@ -82,7 +83,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/image-size/image-size.git"
+    "url": "git+https://github.com/alquigo/image-size.git"
   },
   "author": "netroy <aditya@netroy.in> (http://netroy.in/)",
   "license": "MIT",
